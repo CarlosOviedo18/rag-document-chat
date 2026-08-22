@@ -55,7 +55,7 @@ copy .env.example .env
 - [x] **Fase 0** — Entorno, estructura y prueba de conexión
 - [x] **Fase 1** — Ingesta: leer los documentos y trocearlos
 - [x] **Fase 2** — Índice: embeddings y ChromaDB
-- [ ] **Fase 3** — RAG en consola: recuperar + responder
-- [ ] **Fase 4** — Backend: FastAPI con endpoint `/preguntar`
+- [x] **Fase 3** — RAG en consola: recuperar + responder
+- [x] **Fase 4** — Backend: FastAPI con endpoint `/preguntar`
 - [ ] **Fase 5** — Frontend: interfaz de chat
 - [ ] **Fase 6** — Mejoras: citar fuentes, historial, streaming
