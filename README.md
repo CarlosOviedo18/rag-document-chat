@@ -1,3 +1,4 @@
+
 # RAG Chat — Chatbot sobre documentos
 
 Aplicación web que responde preguntas usando **solo** el contenido de unos
