@@ -42,14 +42,16 @@ copy .env.example .env
 
 | Ruta | Qué contiene |
 |---|---|
-| `documentos/` | Los PDF y TXT de origen |
+| `documentos/` | Los archivos `.md` y `.txt` de origen |
 | `app/config.py` | Claves, rutas y parámetros en un solo sitio |
 | `app/prueba_conexion.py` | Prueba de humo de las dos APIs |
+| `app/prueba_trocear.py` | Comprobaciones de la función de troceado |
 | `app/ingesta.py` | Fase 1 — leer y trocear los documentos |
 | `app/indice.py` | Fase 2 — vectorizar y guardar en ChromaDB |
 | `app/rag.py` | Fase 3 — recuperar y preguntar a Claude |
 | `app/main.py` | Fase 4 — la API con FastAPI |
-| `web/` | Fase 5 — la interfaz de chat |
+| `frontend/` | Fase 5 — la interfaz de chat en React |
+| `web/` | Salida compilada del frontend (generada, no versionada) |
 
 ## Hoja de ruta
 
@@ -58,5 +60,5 @@ copy .env.example .env
 - [x] **Fase 2** — Índice: embeddings y ChromaDB
 - [x] **Fase 3** — RAG en consola: recuperar + responder
 - [x] **Fase 4** — Backend: FastAPI con endpoint `/preguntar`
-- [ ] **Fase 5** — Frontend: interfaz de chat
+- [x] **Fase 5** — Frontend: interfaz de chat en React
 - [ ] **Fase 6** — Mejoras: citar fuentes, historial, streaming

@@ -64,23 +64,3 @@ export async function preguntar(texto, senal) {
 
   return respuesta.json()
 }
-
-/**
- * Comprueba que el backend está vivo y con qué modelos está configurado.
- *
- * @param {AbortSignal} [senal]
- * @returns {Promise<{
- *   estado: string,
- *   modelo_chat: string,
- *   modelo_embeddings: string,
- * }>}
- */
-export async function comprobarSalud(senal) {
-  const respuesta = await fetch('/salud', { signal: senal })
-
-  if (!respuesta.ok) {
-    throw new Error(await mensajeDeError(respuesta))
-  }
-
-  return respuesta.json()
-}

@@ -4,4 +4,3 @@ chromadb           # base de datos vectorial local
 fastapi            # framework del backend web
 uvicorn[standard]  # servidor que ejecuta FastAPI
 python-dotenv      # lee las claves desde el archivo .env
-pypdf              # extrae texto de archivos PDF

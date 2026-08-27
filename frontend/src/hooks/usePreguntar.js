@@ -86,12 +86,5 @@ export function usePreguntar() {
     enviar(pregunta)
   }, [cargando, enviar])
 
-  /** Vacía la conversación y vuelve al estado inicial. */
-  const limpiar = useCallback(() => {
-    setMensajes([])
-    setError(null)
-    ultimaPregunta.current = null
-  }, [])
-
-  return { mensajes, cargando, error, enviar, reintentar, limpiar }
+  return { mensajes, cargando, error, enviar, reintentar }
 }

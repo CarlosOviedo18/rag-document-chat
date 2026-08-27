@@ -13,7 +13,7 @@ from app import config
 
 
 # Extensiones que sabemos leer.
-EXTENSIONES = {".md", ".txt", ".pdf"}
+EXTENSIONES = {".md", ".txt"}
 
 
 def leer_documentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
@@ -29,15 +29,9 @@ def leer_documentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
         if ruta.suffix.lower() not in EXTENSIONES:
             continue
 
-        if ruta.suffix.lower() == ".pdf":
-            from pypdf import PdfReader
-
-            lector = PdfReader(ruta)
-            texto = "\n".join(pagina.extract_text() or "" for pagina in lector.pages)
-        else:
-            texto = ruta.read_text(encoding="utf-8")
-
-        texto = texto.strip()
+        # encoding="utf-8" es obligatorio en Windows: sin el, los acentos
+        # y el simbolo del colon salen rotos.
+        texto = ruta.read_text(encoding="utf-8").strip()
         if not texto:
             print(f"  aviso: {ruta.name} esta vacio, se omite")
             continue
@@ -52,21 +46,7 @@ def trocear(
     tamano: int = config.TAMANO_CHUNK,
     solapamiento: int = config.SOLAPAMIENTO_CHUNK,
 ) -> list[str]:
-    """Parte un texto largo en fragmentos solapados.
-
-    Ejemplo con tamano=10 y solapamiento=3:
-
-        texto    = "ABCDEFGHIJKLMNOPQRSTU"   (21 caracteres)
-        frag[0]  = "ABCDEFGHIJ"              (posiciones  0..10)
-        frag[1]  = "HIJKLMNOPQ"              (posiciones  7..17)  <- repite "HIJ"
-        frag[2]  = "OPQRSTU"                 (posiciones 14..21)  <- repite "OPQ"
-
-    Cada fragmento empieza `tamano - solapamiento` caracteres despues
-    del anterior. Ahi esta toda la logica.
-    """
-    # Si el solapamiento fuese igual o mayor que el tamano, el avance
-    # seria 0 o negativo y el bucle no terminaria nunca. Mejor fallar
-    # aqui, con un mensaje claro, que colgar el programa.
+ 
     if solapamiento >= tamano:
         raise ValueError(
             f"El solapamiento ({solapamiento}) debe ser menor "

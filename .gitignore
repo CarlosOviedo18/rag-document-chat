@@ -13,3 +13,6 @@ __pycache__/
 
 # Configuracion local de herramientas
 .claude/
+
+# Salida compilada del frontend (se regenera con npm run build)
+web/
