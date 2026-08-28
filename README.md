@@ -1,5 +1,22 @@
 # RAG Chat — Chatbot sobre documentos propios
 
+## Demo
+
+<!--
+  Guardar la grabación como docs/demo.gif y se muestra aquí sola.
+
+  Si prefieres MP4: abre una issue nueva en el repo, arrastra el vídeo al
+  cuadro de texto, copia la URL que genera GitHub y sustituye la línea de
+  abajo por esa URL a pelo (sin ![]() ). GitHub la convierte en reproductor.
+  No hace falta publicar la issue.
+-->
+
+![Demo del chat](docs/demo.gif)
+
+> El asistente responde con los precios reales del menú, muestra de qué
+> archivo salió cada dato, y admite cuando la información no está en los
+> documentos.
+
 Aplicación web que responde preguntas usando **únicamente** el contenido de
 unos documentos propios. El caso de ejemplo es una cafetería costarricense:
 menú, métodos de preparación, orígenes del café y preguntas frecuentes.
