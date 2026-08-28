@@ -5,9 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
-  // En desarrollo React vive en :5173 y la API en :8000. El proxy reenvía
-  // estas rutas al backend, así el navegador cree que todo viene del mismo
-  // origen y no hace falta configurar CORS en FastAPI.
+  // React vive en :5173 y la API en :8000. El proxy hace que el navegador
+  // vea un solo origen, así que no hace falta configurar CORS en FastAPI.
   server: {
     proxy: {
       '/preguntar': 'http://127.0.0.1:8000',
@@ -15,7 +14,7 @@ export default defineConfig({
     },
   },
 
-  // Al compilar, dejar el resultado donde FastAPI ya sabe servir estáticos.
+  // Compila donde FastAPI ya sabe servir estáticos.
   build: {
     outDir: '../web',
     emptyOutDir: true,

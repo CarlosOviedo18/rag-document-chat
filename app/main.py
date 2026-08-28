@@ -1,16 +1,8 @@
-"""Fase 4 — Backend: exponer el RAG como una API web.
+"""Backend: expone el RAG como una API web.
 
-Este archivo NO contiene logica de RAG. Solo traduce:
+No contiene logica de RAG. Solo traduce peticion HTTP -> responder() -> JSON.
 
-    peticion HTTP  ->  llamada a responder()  ->  respuesta JSON
-
-Toda la inteligencia sigue viviendo en indice.py y rag.py.
-
-Arrancar el servidor:
     .venv\\Scripts\\python.exe -m uvicorn app.main:app --reload
-
-Luego abrir en el navegador:
-    http://127.0.0.1:8000/         la web (Fase 5)
 """
 
 from pathlib import Path
@@ -30,10 +22,9 @@ app = FastAPI(
 )
 
 
-# --- Forma de los datos que entran y salen ---------------------------------
-# Con estas clases, FastAPI valida las peticiones automaticamente y genera
-# la documentacion de /docs. Si falta un campo o llega con el tipo
-# equivocado, responde un 422 explicando que esta mal.
+# --- Forma de los datos -----------------------------------------------------
+# FastAPI valida las peticiones contra estas clases y genera con ellas la
+# documentacion de /docs. Una peticion mal formada recibe un 422 explicativo.
 
 
 class Pregunta(BaseModel):
@@ -71,17 +62,15 @@ def salud() -> dict:
 def preguntar(pregunta: Pregunta) -> Respuesta:
     """Responde una pregunta a partir de los documentos indexados.
 
-    Se define con `def` y no con `async def` a proposito: responder()
-    bloquea mientras espera a Voyage y a Claude. Con `def`, FastAPI la
-    ejecuta en un hilo aparte y el servidor puede seguir atendiendo a
-    otros clientes mientras tanto.
+    `def` y no `async def` a proposito: responder() bloquea esperando a
+    Voyage y a Claude, y asi FastAPI la ejecuta en un hilo aparte en vez
+    de congelar el servidor entero.
     """
     try:
         resultado = responder(pregunta.texto)
     except Exception as error:
-        # Sin este bloque, un fallo de Voyage o de Claude tumbaria la
-        # peticion con un 500 sin explicacion. Asi el navegador recibe
-        # algo que se puede mostrar al usuario.
+        # Traduce cualquier fallo de las APIs externas a un error que el
+        # navegador pueda mostrar, en vez de un 500 sin explicacion.
         raise HTTPException(
             status_code=502,
             detail=f"Fallo al generar la respuesta: {error}",
@@ -104,8 +93,8 @@ def preguntar(pregunta: Pregunta) -> Respuesta:
 
 
 # --- Frontend --------------------------------------------------------------
-# Se monta al final para que no tape las rutas de arriba. Sirve la carpeta
-# web/ tal cual: index.html en la raiz, y el resto de archivos junto a el.
+# Al final a proposito: montado en "/", si estuviera arriba taparia las
+# rutas anteriores.
 
 CARPETA_WEB = Path(__file__).resolve().parent.parent / "web"
 CARPETA_WEB.mkdir(exist_ok=True)

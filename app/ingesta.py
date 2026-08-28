@@ -1,25 +1,33 @@
+"""Ingesta: lee los documentos de la carpeta y los parte en fragmentos.
+
+No habla con ninguna API, solo manipula texto.
+
+    .venv\\Scripts\\python.exe -m app.ingesta
+"""
+
 from pathlib import Path
 
 from app import config
 
 
-# Extensiones que sabemos leer.
 EXTENSIONES = {".md", ".txt"}
 
-#IMPRIME UN DICCIONARIO
+
 def leer_documentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
+    """Devuelve [{"fuente": nombre, "texto": contenido}, ...].
+
+    El nombre del archivo viaja junto al texto desde aqui, para poder
+    citar la fuente de cada respuesta mas adelante.
+    """
     documentos = []
 
-    for ruta in sorted(carpeta.iterdir()): #reccore el for en orden con sorted
-
+    for ruta in sorted(carpeta.iterdir()):
         if ruta.suffix.lower() not in EXTENSIONES:
             continue
 
-        # encoding="utf-8" es obligatorio en Windows: sin el, los acentos
-        # y el simbolo del colon salen rotos.
+        # encoding explicito: en Windows, sin el, los acentos salen rotos.
         texto = ruta.read_text(encoding="utf-8").strip()
         if not texto:
-            print(f"  aviso: {ruta.name} esta vacio, se omite")
             continue
 
         documentos.append({"fuente": ruta.name, "texto": texto})
@@ -32,7 +40,12 @@ def trocear(
     tamano: int = config.TAMANO_CHUNK,
     solapamiento: int = config.SOLAPAMIENTO_CHUNK,
 ) -> list[str]:
- 
+    """Parte el texto en fragmentos que se solapan entre si.
+
+    Cada fragmento mide `tamano` pero el inicio avanza solo
+    `tamano - solapamiento`, asi que cada uno repite el final del
+    anterior y ninguna idea queda partida en dos trozos inservibles.
+    """
     if solapamiento >= tamano:
         raise ValueError(
             f"El solapamiento ({solapamiento}) debe ser menor "
@@ -44,7 +57,7 @@ def trocear(
     inicio = 0
 
     while inicio < len(texto):
-        trozo = texto[inicio:inicio + tamano].strip() #strip por trozo vacio
+        trozo = texto[inicio:inicio + tamano].strip()
         if trozo:
             fragmentos.append(trozo)
 
@@ -54,10 +67,15 @@ def trocear(
 
 
 def preparar_fragmentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
+    """Devuelve [{"id": "menu.md#3", "texto": ..., "fuente": ...}, ...].
+
+    El id lleva delante el nombre del archivo porque la numeracion se
+    reinicia en cada documento, y ChromaDB lo usa como clave unica.
+    """
     fragmentos = []
 
     for documento in leer_documentos(carpeta):
-        for numero, trozo in enumerate(trocear(documento["texto"])):#como clave yvalor
+        for numero, trozo in enumerate(trocear(documento["texto"])):
             fragmentos.append(
                 {
                     "id": f"{documento['fuente']}#{numero}",

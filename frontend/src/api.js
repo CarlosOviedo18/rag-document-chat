@@ -20,7 +20,6 @@ async function mensajeDeError(respuesta) {
     const cuerpo = await respuesta.json()
     detalle = cuerpo?.detail
   } catch {
-    // El cuerpo no era JSON (por ejemplo, un error del proxy).
     detalle = null
   }
 
@@ -56,8 +55,7 @@ export async function preguntar(texto, senal) {
     signal: senal,
   })
 
-  // Ojo: fetch NO lanza error con un 500 o un 404. Solo falla si no hay
-  // red. Hay que comprobar `ok` a mano.
+  // fetch no lanza error con un 500 o un 404: solo falla si no hay red.
   if (!respuesta.ok) {
     throw new Error(await mensajeDeError(respuesta))
   }

@@ -1,3 +1,10 @@
+"""RAG: recupera los fragmentos relevantes y pide a Claude que redacte.
+
+Lo determinante de este modulo no es el codigo, son las INSTRUCCIONES:
+un modelo siempre responde algo, y si no se le prohibe inventar, inventa.
+
+    .venv\\Scripts\\python.exe -m app.rag
+"""
 
 import anthropic
 
@@ -6,7 +13,6 @@ from app.indice import buscar
 
 
 # Precio por millon de tokens (entrada, salida) en dolares.
-# Solo sirve para mostrar el coste en pantalla.
 PRECIOS = {
     "claude-haiku-4-5": (1.0, 5.0),
     "claude-sonnet-5": (3.0, 15.0),
@@ -32,7 +38,7 @@ Reglas:
 
 
 def construir_contexto(fragmentos: list[dict]) -> str:
-
+    """Une los fragmentos en un solo texto, etiquetado con su origen."""
     partes = []
 
     for numero, fragmento in enumerate(fragmentos, start=1):
@@ -51,14 +57,18 @@ def calcular_coste(modelo: str, entrada: int, salida: int) -> float:
 
 
 def responder(pregunta: str) -> dict:
+    """Devuelve la respuesta junto a los fragmentos usados y el coste.
 
+    Se devuelve todo, y no solo el texto, para poder ver por que respondio
+    lo que respondio: sin eso, depurar un RAG es a ciegas.
+    """
     fragmentos = buscar(pregunta)
     contexto = construir_contexto(fragmentos)
 
     cliente = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
 
-    # "system" son las reglas: no cambian nunca.
-    # "messages" son los datos de esta consulta concreta.
+    # "system" son las reglas, identicas en cada consulta; "messages" son
+    # los datos de esta. Separarlos permite cachear la parte fija.
     respuesta = cliente.messages.create(
         model=config.MODELO_CHAT,
         max_tokens=1000,
@@ -75,7 +85,7 @@ def responder(pregunta: str) -> dict:
         ],
     )
 
-    # respuesta.content es una LISTA de bloques. Cogemos el primero de texto.
+    # content es una lista de bloques (texto, razonamiento, ...), no un str.
     texto = next(b.text for b in respuesta.content if b.type == "text")
 
     return {

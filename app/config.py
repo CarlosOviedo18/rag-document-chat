@@ -1,15 +1,10 @@
-"""Configuracion central del proyecto.
-
-Todo lo que sea una constante o una clave vive aqui, para no tener
-numeros magicos repartidos por el codigo.
-"""
+"""Configuracion central: claves, rutas, modelos y parametros del RAG."""
 
 from pathlib import Path
 
 from dotenv import load_dotenv
 import os
 
-# Carga las variables del archivo .env a las variables de entorno del proceso.
 load_dotenv()
 
 # --- Claves de API ---------------------------------------------------------
@@ -22,31 +17,18 @@ CARPETA_DOCUMENTOS = RAIZ / "documentos"
 CARPETA_CHROMA = RAIZ / "chroma_db"
 
 # --- Modelos ---------------------------------------------------------------
-# Haiku es el modelo mas barato ($1 / $5 por millon de tokens): ideal
-# mientras desarrollamos, porque lanzaremos la misma consulta muchas veces.
-# Para la version final, cambiar a "claude-opus-5" (mejor calidad, ~5x precio).
+# Haiku ($1 / $5 por millon) mientras se desarrolla: la misma consulta se
+# lanza muchas veces. Para produccion, "claude-opus-5" (~5x precio).
 MODELO_CHAT = "claude-haiku-4-5"
-
-# voyage-4-lite: generacion mas reciente, multilingue, vectores de 1024
-# dimensiones. Comprobado que la clave tiene acceso (ver Fase 0).
 MODELO_EMBEDDINGS = "voyage-4-lite"
 
 # --- Parametros del RAG ----------------------------------------------------
-# Tamano de cada fragmento de texto, en caracteres.
-# Muy pequeno = pierdes contexto. Muy grande = el fragmento trae mucho ruido.
 # Ajustado a 400 tras medir: con un corpus de ~8.500 caracteres, 900
-# generaba solo 13 fragmentos y cada consulta se llevaba el 38% de todo.
-# Con 400 salen 28 fragmentos del tamano de un parrafo.
+# generaba solo 13 fragmentos y cada consulta se llevaba el 38% del total.
 TAMANO_CHUNK = 400
-
-# Cuantos caracteres comparte un fragmento con el siguiente.
-# Evita cortar una idea justo por la mitad.
 SOLAPAMIENTO_CHUNK = 80
 
-# Cuantos fragmentos recuperamos para responder una pregunta.
 FRAGMENTOS_A_RECUPERAR = 5
-
-# Nombre de la coleccion dentro de ChromaDB.
 NOMBRE_COLECCION = "cafe"
 
 
