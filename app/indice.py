@@ -1,17 +1,3 @@
-"""Fase 2 — Indice: convertir los fragmentos en vectores y guardarlos.
-
-Dos operaciones distintas viven aqui:
-
-  construir_indice()  Se ejecuta UNA VEZ (o cuando cambian los documentos).
-                      Lee los fragmentos, los manda a Voyage y guarda el
-                      resultado en ChromaDB.
-
-  buscar()            Se ejecuta EN CADA PREGUNTA. Convierte la pregunta
-                      en un vector y pide a ChromaDB los mas parecidos.
-
-Uso:
-    .venv\\Scripts\\python.exe -m app.indice
-"""
 
 import time
 
@@ -21,38 +7,23 @@ import voyageai
 from app import config
 from app.ingesta import preparar_fragmentos
 
-
-# Voyage no acepta miles de textos en una sola llamada. Los mandamos
-# por tandas. Con 28 fragmentos sobra una, pero esto seguira funcionando
-# si algun dia metes 500 documentos.
 TAMANO_TANDA = 100
 
-# Sin tarjeta registrada, Voyage limita a 3 peticiones por minuto.
-# Cuando nos corta, esperamos y reintentamos en vez de reventar.
 SEGUNDOS_ESPERA_LIMITE = 25
 REINTENTOS = 3
 
-
+#Abre la conexión con Voyage
 def cliente_voyage() -> voyageai.Client:
     return voyageai.Client(api_key=config.VOYAGE_API_KEY)
 
-
+#guardar en bd en disco 
 def cliente_chroma() -> chromadb.ClientAPI:
-    """Abre la base de datos vectorial en disco.
 
-    PersistentClient guarda todo en la carpeta chroma_db/. No hay
-    servidor que arrancar: son archivos, como SQLite.
-    """
     return chromadb.PersistentClient(path=str(config.CARPETA_CHROMA))
 
 
 def obtener_coleccion(cliente: chromadb.ClientAPI):
-    """Devuelve la coleccion (el equivalente a una 'tabla').
 
-    hnsw:space = "cosine" le dice a Chroma como medir el parecido entre
-    dos vectores. La similitud del coseno mide el ANGULO entre ellos, no
-    la distancia en linea recta, y es la metrica estandar para texto.
-    """
     return cliente.get_or_create_collection(
         name=config.NOMBRE_COLECCION,
         metadata={"hnsw:space": "cosine"},
@@ -60,17 +31,7 @@ def obtener_coleccion(cliente: chromadb.ClientAPI):
 
 
 def vectorizar(textos: list[str], tipo: str) -> list[list[float]]:
-    """Convierte una lista de textos en una lista de vectores.
-
-    El parametro `tipo` importa mas de lo que parece:
-
-      "document"  para los fragmentos que estamos guardando
-      "query"     para la pregunta del usuario
-
-    Voyage genera vectores ligeramente distintos segun el caso, porque
-    una pregunta y un fragmento que la responde no se PARECEN entre si
-    (uno pregunta, el otro afirma). Avisando del rol, los acerca.
-    """
+ 
     cliente = cliente_voyage()
     vectores = []
 
@@ -96,7 +57,7 @@ def vectorizar(textos: list[str], tipo: str) -> list[list[float]]:
                 )
                 time.sleep(SEGUNDOS_ESPERA_LIMITE)
 
-        vectores.extend(respuesta.embeddings)
+        vectores.extend(respuesta.embeddings) #lista plana
 
     return vectores
 
@@ -128,13 +89,7 @@ def construir_indice() -> int:
 
 
 def buscar(pregunta: str, cuantos: int = config.FRAGMENTOS_A_RECUPERAR) -> list[dict]:
-    """Devuelve los fragmentos mas parecidos a la pregunta.
 
-    Cada resultado es un diccionario:
-        {"texto": ..., "fuente": ..., "distancia": 0.31}
-
-    La distancia va de 0 a 2: cuanto MENOR, mas parecido.
-    """
     vector_pregunta = vectorizar([pregunta], tipo="query")[0]
 
     coleccion = obtener_coleccion(cliente_chroma())

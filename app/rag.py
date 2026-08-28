@@ -1,16 +1,3 @@
-"""Fase 3 — RAG: recuperar fragmentos y pedirle a Claude que redacte.
-
-Aqui se une todo lo anterior:
-
-    buscar()            de indice.py, devuelve los 5 fragmentos parecidos
-    construir_contexto()  los convierte en un texto etiquetado
-    responder()         se lo manda a Claude junto con la pregunta
-
-Lo importante de este archivo NO es el codigo, son las INSTRUCCIONES.
-Un modelo siempre responde algo; si no le prohibes inventar, inventara.
-
-    .venv\\Scripts\\python.exe -m app.rag
-"""
 
 import anthropic
 
@@ -45,11 +32,7 @@ Reglas:
 
 
 def construir_contexto(fragmentos: list[dict]) -> str:
-    """Convierte los fragmentos recuperados en un unico texto etiquetado.
 
-    Numerarlos y decir de que archivo salen le da al modelo una referencia
-    clara, y nos servira en la Fase 6 para que cite sus fuentes.
-    """
     partes = []
 
     for numero, fragmento in enumerate(fragmentos, start=1):
@@ -68,19 +51,7 @@ def calcular_coste(modelo: str, entrada: int, salida: int) -> float:
 
 
 def responder(pregunta: str) -> dict:
-    """Responde una pregunta usando los documentos indexados.
 
-    Devuelve un diccionario con la respuesta Y con los datos que permiten
-    entender COMO se llego a ella:
-
-        {
-            "respuesta": "El cappuccino cuesta 2.100 colones.",
-            "fragmentos": [...],       # los que se recuperaron
-            "tokens_entrada": 812,
-            "tokens_salida": 24,
-            "coste": 0.0009,
-        }
-    """
     fragmentos = buscar(pregunta)
     contexto = construir_contexto(fragmentos)
 
@@ -121,7 +92,6 @@ def responder(pregunta: str) -> dict:
 
 
 def mostrar(resultado: dict) -> None:
-    """Imprime la respuesta y todo lo que hay detras de ella."""
     print(f"\n{resultado['respuesta']}\n")
 
     print("  " + "-" * 66)

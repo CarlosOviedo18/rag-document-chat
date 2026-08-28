@@ -1,12 +1,3 @@
-"""Fase 1 — Ingesta: leer los documentos y partirlos en fragmentos.
-
-Este modulo NO habla con ninguna API. Solo manipula texto.
-Es la base de todo: si los fragmentos salen mal, el chatbot respondera
-mal por muy bueno que sea el modelo.
-
-    .venv\\Scripts\\python.exe -m app.ingesta
-"""
-
 from pathlib import Path
 
 from app import config
@@ -15,17 +6,12 @@ from app import config
 # Extensiones que sabemos leer.
 EXTENSIONES = {".md", ".txt"}
 
-
+#IMPRIME UN DICCIONARIO
 def leer_documentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
-    """Lee todos los documentos de la carpeta y devuelve su texto.
-
-    Devuelve una lista de diccionarios: {"fuente": nombre, "texto": ...}
-    Guardamos el nombre del archivo porque mas adelante querremos poder
-    decirle al usuario DE DONDE sale cada respuesta.
-    """
     documentos = []
 
-    for ruta in sorted(carpeta.iterdir()):
+    for ruta in sorted(carpeta.iterdir()): #reccore el for en orden con sorted
+
         if ruta.suffix.lower() not in EXTENSIONES:
             continue
 
@@ -58,11 +44,7 @@ def trocear(
     inicio = 0
 
     while inicio < len(texto):
-        # Cortar de "inicio" hasta "inicio + tamano". Si nos pasamos del
-        # final, Python devuelve lo que haya, sin dar error.
-        trozo = texto[inicio:inicio + tamano].strip()
-
-        # Un trozo puede quedar vacio al final del texto: no lo guardamos.
+        trozo = texto[inicio:inicio + tamano].strip() #strip por trozo vacio
         if trozo:
             fragmentos.append(trozo)
 
@@ -72,19 +54,10 @@ def trocear(
 
 
 def preparar_fragmentos(carpeta: Path = config.CARPETA_DOCUMENTOS) -> list[dict]:
-    """Junta las dos piezas: lee los documentos y los trocea.
-
-    Devuelve la lista que la Fase 2 mandara a vectorizar. Cada elemento:
-
-        {"id": "menu.md#3", "texto": "...", "fuente": "menu.md"}
-
-    El `id` tiene que ser unico porque ChromaDB lo usa como clave; asi,
-    si reindexas, sobrescribe en vez de duplicar.
-    """
     fragmentos = []
 
     for documento in leer_documentos(carpeta):
-        for numero, trozo in enumerate(trocear(documento["texto"])):
+        for numero, trozo in enumerate(trocear(documento["texto"])):#como clave yvalor
             fragmentos.append(
                 {
                     "id": f"{documento['fuente']}#{numero}",
