@@ -2,14 +2,7 @@
 
 ## Demo
 
-<!--
-  Guardar la grabación como docs/demo.gif y se muestra aquí sola.
-
-  Si prefieres MP4: abre una issue nueva en el repo, arrastra el vídeo al
-  cuadro de texto, copia la URL que genera GitHub y sustituye la línea de
-  abajo por esa URL a pelo (sin ![]() ). GitHub la convierte en reproductor.
-  No hace falta publicar la issue.
--->
+https://github.com/user-attachments/assets/c7773ea7-99c4-479c-af05-d8b8ba71c611
 
 ![Demo del chat](docs/demo.gif)
 
