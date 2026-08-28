@@ -2,7 +2,7 @@
 
 ## Demo
 
-https://github.com/user-attachments/assets/c7773ea7-99c4-479c-af05-d8b8ba71c611
+
 
 ![Demo del chat](docs/demo.gif)
 
